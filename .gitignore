@@ -1,36 +1,19 @@
-# --- Common / OS ---
-.DS_Store
-Thumbs.db
-*.log
-logs
-*.gz
-
-# --- Dependency Directories ---
+# Dependencies
 node_modules/
-jspm_packages/
 
-# --- TypeScript / Build Artifacts ---
-dist/
+# Build output
 build/
-out/
-*.tsbuildinfo
-lib-cov/
-coverage/
-.nyc_output
+dist/
 
-# --- Environment Variables (CRITICAL) ---
-# Never commit secrets to AWS (Cognito, RDS, SES keys)
+# Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env.stack
-*.env
 
-# --- IDEs / Editors ---
-.vscode/*
-!.vscode/extensions.json
+# IDE and editor directories
+.vscode/
 .idea/
 *.suo
 *.ntvs*
@@ -38,22 +21,11 @@ coverage/
 *.sln
 *.sw?
 
-# --- Docker ---
-# Ignore data persisted by local containers (like Redis or Postgres)
-.docker/
-docker-data/
-postgres-data/
+# OS-generated files
+.DS_Store
+Thumbs.db
 
-# --- Frontend (React specific) ---
-.eslintcache
-.stylelintcache
-template-dependency-debug.log
-
-# --- AWS / Terraform (if applicable) ---
-.aws/
-.terraform/
-terraform.tfstate*
-
-# --- Testing ---
-__snapshots__/
-junit.xml
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
