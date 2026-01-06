@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SearchFlights from '../components/SearchFlights';
 
 import BuyTicket from '../components/BuyTicket';
+import Login from '../components/Login';
 
 const Home = () => <h2>User Home</h2>;
 
@@ -12,6 +13,7 @@ const UserRoutes = () => {
     <Router>
       <Routes>
         <Route path="/home" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/search" element={<SearchFlights />} />
         <Route path="/buy-ticket/:id" element={<BuyTicket />} />
         <Route path="/" element={<Home />} /> {/* Default route */}

@@ -4,6 +4,7 @@ import axios from 'axios';
 const Register = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
     const [role, setRole] = useState('user'); // Default to 'user'
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -19,11 +20,13 @@ const Register = () => {
             await axios.post('http://localhost:3002/register', {
                 username,
                 password,
+                email,
                 role,
             });
             setSuccess('Registration successful! You can now log in.');
             setUsername('');
             setPassword('');
+            setEmail('');
             setRole('user');
         } catch (err: any) {
             setError(err.response?.data || 'Registration failed. Please try again.');
@@ -42,6 +45,15 @@ const Register = () => {
                         type="text" 
                         value={username} 
                         onChange={(e) => setUsername(e.target.value)} 
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Email:</label>
+                    <input 
+                        type="email" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
                         required
                     />
                 </div>
