@@ -12,6 +12,20 @@ const AddFlight = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
+    const [predicting, setPredicting] = useState(false);
+
+    const handlePredictPrice = async () => {
+        setPredicting(true);
+        setError('');
+        try {
+            const response = await axios.get('http://localhost:3000/api/v1/flights/flights/predict-price');
+            setPrice(response.data.predictedPrice.toString());
+        } catch (err) {
+            setError('Failed to predict price. Please try again.');
+        } finally {
+            setPredicting(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,7 +51,7 @@ const AddFlight = () => {
         };
 
         try {
-            await axios.post('http://localhost:3001/flights', flightData, {
+            await axios.post('http://localhost:3000/api/v1/flights/flights', flightData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -82,6 +96,9 @@ const AddFlight = () => {
                 <div>
                     <label>Price:</label>
                     <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
+                    <button type="button" onClick={handlePredictPrice} disabled={predicting}>
+                        {predicting ? 'Predicting...' : 'Predict Price'}
+                    </button>
                 </div>
                 <div>
                     <label>Duration (in minutes):</label>

@@ -109,26 +109,52 @@ app.post('/flights', authenticateJWT, isAdmin, async (req: Request, res: Respons
   }
 });
 
-// Endpoint to search for flights
+// Mock ML Price Prediction Endpoint
+app.get('/flights/predict-price', (req: Request, res: Response) => {
+    // In a real scenario, this would use a machine learning model
+    // to predict the price based on query parameters like fromCity, toCity, flightDate, etc.
+    const mockPredictedPrice = 5000;
+    res.status(200).json({ predictedPrice: mockPredictedPrice });
+});
+
+// Endpoint to search for flights with pagination
 app.get('/flights', async (req: Request, res: Response) => {
     try {
-        const { fromCity, toCity, flightDate } = req.query;
+        const { fromCity, toCity, flightDate, page = '1', limit = '10' } = req.query;
 
         if (!fromCity || !toCity || !flightDate) {
             return res.status(400).send('Please provide fromCity, toCity, and flightDate query parameters.');
         }
 
+        const pageNumber = parseInt(page as string);
+        const limitNumber = parseInt(limit as string);
+        const skip = (pageNumber - 1) * limitNumber;
+
         const flightRepository = AppDataSource.getRepository(Flight);
-        
-        const flights = await flightRepository.find({
+
+        const [flights, total] = await flightRepository.findAndCount({
             where: {
                 fromCity: fromCity as string,
                 toCity: toCity as string,
-                flightDate: new Date(flightDate as string), 
+                flightDate: new Date(flightDate as string),
+            },
+            skip,
+            take: limitNumber,
+            order: {
+                flightDate: 'ASC',
+                id: 'ASC'
             }
         });
 
-        res.status(200).json(flights);
+        res.status(200).json({
+            data: flights,
+            pagination: {
+                page: pageNumber,
+                limit: limitNumber,
+                total,
+                totalPages: Math.ceil(total / limitNumber)
+            }
+        });
     } catch (error) {
         console.error('Error searching flights:', error);
         res.status(500).send('Error searching flights');

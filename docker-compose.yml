@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # API Gateway Service
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - IAM_SERVICE_URL=http://iam-service:3002
+      - FLIGHT_SERVICE_URL=http://flight-service:3001
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3003
+    depends_on:
+      - iam-service
+      - flight-service
+      - notification-service
+    networks:
+      - airline-network
+
+  # IAM Service
+  iam-service:
+    build:
+      context: ./services/iam-service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - JWT_SECRET=your-secret-key-change-in-production
+      - PARTNER_API_KEY=partner-api-key-12345
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3003
+    networks:
+      - airline-network
+
+  # Flight Service
+  flight-service:
+    build:
+      context: ./services/flight-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DB_TYPE=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=airline_db
+    depends_on:
+      - postgres
+    networks:
+      - airline-network
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - GMAIL_USER=${GMAIL_USER}
+      - GMAIL_PASS=${GMAIL_PASS}
+    networks:
+      - airline-network
+
+  # Scheduler Service
+  scheduler-service:
+    build:
+      context: ./services/scheduler-service
+      dockerfile: Dockerfile
+    environment:
+      - FLIGHT_SERVICE_URL=http://flight-service:3001
+    depends_on:
+      - flight-service
+    networks:
+      - airline-network
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=airline_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - airline-network
+
+networks:
+  airline-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
