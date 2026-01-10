@@ -19,7 +19,8 @@ export const AppDataSource = new DataSource({
   entities: [Flight, Booking],
   migrations: ["src/migration/**/*.ts"],
   subscribers: ["src/subscriber/**/*.ts"],
-  ssl: {
+  // Only use SSL for cloud databases, not for local Docker
+  ssl: process.env.DB_SSL === 'true' ? {
     rejectUnauthorized: false
-  }
+  } : false
 });
